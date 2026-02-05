@@ -40,16 +40,6 @@
 
 ---
 
-## 🚀 Demo
-
-### Light Mode
-![Light Mode](https://via.placeholder.com/800x400/f8fafc/667eea?text=Light+Mode+Dashboard)
-
-### Dark Mode
-![Dark Mode](https://via.placeholder.com/800x400/000000/667eea?text=Dark+Mode+Dashboard)
-
----
-
 ## 🎯 Quick Start
 
 ### 1️⃣ Setup Google Sheet

@@ -4,6 +4,7 @@
 // Configuration - Replace with your Google Sheet ID
 const SHEET_ID = '1iIgtHQGAik8M1YpSPKYZrWf0FB2zPojj0a90CxiNoio';
 const SHEET_NAME = 'Feb26'; // Change if your sheet has a different name
+const CONTESTS_SHEET_NAME = 'Contests';
 
 // Column indices (0-based)
 const COLUMNS = {
@@ -25,12 +26,18 @@ function doGet(e) {
     switch (action) {
       case 'getTodayStatusCount':
         return getTodayStatusCount();
+      case 'getTotalStatusCount':
+        return getTotalStatusCount();
       case 'getTodaysData':
         return getTodaysData();
       case 'getRecord':
         return getRecord(e.parameter.loanCode);
       case 'searchRecords':
         return searchRecords(e.parameter.searchType, e.parameter.searchValue);
+      case 'getContestData':
+        return getContestData(e.parameter.startDate, e.parameter.endDate);
+      case 'getContests':
+        return getContests();
       default:
         return createResponse(true, 'CRM API is running');
     }
@@ -53,6 +60,11 @@ function doPost(e) {
         return updateRecord(updateData, parseInt(e.parameter.rowIndex));
       case 'deleteRecord':
         return deleteRecord(e.parameter.loanCode, parseInt(e.parameter.rowIndex));
+      case 'saveContest':
+        const contestData = JSON.parse(e.parameter.data);
+        return saveContest(contestData);
+      case 'deleteContest':
+        return deleteContest(e.parameter.contestId);
       default:
         return createResponse(false, 'Invalid action');
     }
@@ -81,6 +93,12 @@ function createResponse(success, message, data = null) {
 function getSheet() {
   const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
   return spreadsheet.getSheetByName(SHEET_NAME);
+}
+
+// Get contests sheet
+function getContestsSheet() {
+  const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+  return spreadsheet.getSheetByName(CONTESTS_SHEET_NAME);
 }
 
 // Add new record
@@ -332,6 +350,156 @@ function getTodayStatusCount() {
     return createResponse(true, 'Status counts retrieved', statusCounts);
   } catch (error) {
     return createResponse(false, 'Error getting status counts: ' + error.message);
+  }
+}
+
+// Get total status count (all records)
+function getTotalStatusCount() {
+  try {
+    const sheet = getSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    const statusCounts = {
+      'Doc Pending': 0,
+      'Hot Lead': 0,
+      'Recheck': 0,
+      'Pending': 0,
+      'AWH': 0
+    };
+    
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      const status = data[i][COLUMNS.STATUS];
+      if (statusCounts.hasOwnProperty(status)) {
+        statusCounts[status]++;
+      }
+    }
+    
+    return createResponse(true, 'Total status counts retrieved', statusCounts);
+  } catch (error) {
+    return createResponse(false, 'Error getting total status counts: ' + error.message);
+  }
+}
+
+// Get contest data for date range
+function getContestData(startDate, endDate) {
+  try {
+    const sheet = getSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    const dailyData = {};
+    let weeklyTotal = 0;
+    
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      const recordDate = new Date(data[i][COLUMNS.TIMESTAMP]);
+      const dateStr = formatDateForComparison(recordDate);
+      const status = data[i][COLUMNS.STATUS];
+      
+      // Check if date is within range
+      if (dateStr >= startDate && dateStr <= endDate) {
+        if (!dailyData[dateStr]) {
+          dailyData[dateStr] = 0;
+        }
+        
+        if (status === 'Hot Lead') {
+          dailyData[dateStr]++;
+          weeklyTotal++;
+        }
+      }
+    }
+    
+    // Convert to array format
+    const daily = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = formatDateForComparison(d);
+      daily.push({
+        date: dateStr,
+        hotLeads: dailyData[dateStr] || 0
+      });
+    }
+    
+    return createResponse(true, 'Contest data retrieved', {
+      daily: daily,
+      weeklyTotal: weeklyTotal
+    });
+  } catch (error) {
+    return createResponse(false, 'Error getting contest data: ' + error.message);
+  }
+}
+
+// Get all contests
+function getContests() {
+  try {
+    const sheet = getContestsSheet();
+    const data = sheet.getDataRange().getValues();
+    const contests = [];
+    
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0]) { // Check if ID exists
+        contests.push({
+          id: data[i][0],
+          name: data[i][1],
+          startDate: data[i][2],
+          endDate: data[i][3],
+          slabs: JSON.parse(data[i][4])
+        });
+      }
+    }
+    
+    return createResponse(true, 'Contests retrieved', contests);
+  } catch (error) {
+    return createResponse(false, 'Error getting contests: ' + error.message);
+  }
+}
+
+// Save contest
+function saveContest(contest) {
+  try {
+    const sheet = getContestsSheet();
+    
+    // Add header if sheet is empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(['ID', 'Name', 'Start Date', 'End Date', 'Slabs']);
+    }
+    
+    const newRow = [
+      contest.id,
+      contest.name,
+      contest.startDate,
+      contest.endDate,
+      JSON.stringify(contest.slabs)
+    ];
+    
+    sheet.appendRow(newRow);
+    
+    return createResponse(true, 'Contest saved successfully');
+  } catch (error) {
+    return createResponse(false, 'Error saving contest: ' + error.message);
+  }
+}
+
+// Delete contest
+function deleteContest(contestId) {
+  try {
+    const sheet = getContestsSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    // Find and delete the contest row
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0].toString() === contestId.toString()) {
+        sheet.deleteRow(i + 1);
+        return createResponse(true, 'Contest deleted successfully');
+      }
+    }
+    
+    return createResponse(false, 'Contest not found');
+  } catch (error) {
+    return createResponse(false, 'Error deleting contest: ' + error.message);
   }
 }
 
