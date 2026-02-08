@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Leads Tracker</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Theme Toggle -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="icon">📊</i> Shadow Leads Tracker</h1>
+                <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+                    <span class="sun">☀️</span>
+                    <span class="moon">🌙</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Top Action Bar -->
+        <div class="action-bar" style="display: none;">
+            <button id="addNewBtn" class="btn btn-primary">
+                <i class="icon">➕</i> Add New
+            </button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section card">
+            <h3><i class="icon">🔍</i> Search Records</h3>
+            <div class="search-controls">
+                <select id="searchType">
+                    <option value="loanCode">Loan Code</option>
+                    <option value="applicationId">Application ID</option>
+                    <option value="mobileNumber">Mobile Number</option>
+                </select>
+                <input type="text" id="searchValue" placeholder="Enter search value">
+                <button id="searchBtn" class="btn btn-info">
+                    <i class="icon">🔍</i> Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Add Form -->
+        <div class="card" style="padding: 20px; margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px;"><i class="icon">➕</i> Quick Add Record</h3>
+            <form id="quickAddForm">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Loan Code *</label>
+                        <input type="text" id="quickLoanCode" required style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Application ID</label>
+                        <input type="text" id="quickApplicationId" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Name</label>
+                        <input type="text" id="quickName" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Mobile Number</label>
+                        <input type="number" id="quickMobileNumber" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Status</label>
+                        <select id="quickStatus" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                            <option value="">Select</option>
+                            <option value="Doc Pending">Doc Pending</option>
+                            <option value="Hot Lead">Hot Lead</option>
+                            <option value="Recheck">Recheck</option>
+                            <option value="Pending">Pending</option>
+                            <option value="AWH">AWH</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Sub-Status</label>
+                        <select id="quickSubStatus" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                            <option value="">Select</option>
+                            <option value="Mudra">Mudra</option>
+                            <option value="SE">SE</option>
+                            <option value="HIGH ABC">HIGH ABC</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Auto HL">Auto HL</option>
+                            <option value="Force HL">Force HL</option>
+                            <option value="Post HL">Post HL</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color);">Remarks</label>
+                        <input type="text" id="quickRemarks" style="width: 100%; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; background: var(--card-bg); color: var(--text-color);">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; margin: 0;">
+                            <i class="icon">➕</i> Add
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Results -->
+        <div id="searchResults" class="search-results card" style="display: none;">
+            <div class="search-results-header">
+                <h3><i class="icon">📋</i> Search Results</h3>
+                <button class="close-search" onclick="hideSearchResults()">
+                    <i class="icon">❌</i>
+                </button>
+            </div>
+            <div id="resultsTable"></div>
+        </div>
+
+        <!-- Status Count -->
+        <div class="status-count-section card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3><i class="icon">📈</i> Status Count</h3>
+                <button onclick="loadTodayStatusCount()" class="btn-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 8px 12px;" title="Refresh">
+                    🔄
+                </button>
+            </div>
+            <table class="status-count-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Doc Pending</th>
+                        <th>Hot Lead</th>
+                        <th>Recheck</th>
+                        <th>Pending</th>
+                        <th>AWH</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Today Count</strong></td>
+                        <td id="todayDocPending">0</td>
+                        <td id="todayHotLead">0</td>
+                        <td id="todayRecheck">0</td>
+                        <td id="todayPending">0</td>
+                        <td id="todayAwh">0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Count</strong></td>
+                        <td id="totalDocPending">0</td>
+                        <td id="totalHotLead">0</td>
+                        <td id="totalRecheck">0</td>
+                        <td id="totalPending">0</td>
+                        <td id="totalAwh">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Contest Section -->
+        <div class="card" style="padding: 30px; margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3><i class="icon">🏆</i> Contest Tracker</h3>
+                <button id="addContestBtn" class="btn btn-primary" style="min-width: auto;">
+                    <i class="icon">➕</i> Add Contest
+                </button>
+            </div>
+            <div id="activeContests"></div>
+        </div>
+
+        <!-- Today's Data Table -->
+        <div class="data-table-section card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3><i class="icon">📋</i> Today's Records</h3>
+                <button onclick="loadTodaysData()" class="btn-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 8px 12px;" title="Refresh">
+                    🔄
+                </button>
+            </div>
+            <div id="todaysDataTable"></div>
+        </div>
+
+        <!-- Non-Hot Lead Records -->
+        <div class="data-table-section card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3><i class="icon">📂</i> All Non-Hot Lead Records</h3>
+                <button onclick="loadNonHotLeadData()" class="btn-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 8px 12px;" title="Refresh">
+                    🔄
+                </button>
+            </div>
+            <div id="nonHotLeadTable"></div>
+        </div>
+
+        <!-- Modal for Add/Update -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">Add New Record</h2>
+                <form id="recordForm">
+                    <div class="form-group">
+                        <label for="loanCode">Loan Code: <span style="color: red;">*</span></label>
+                        <input type="text" id="loanCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="applicationId">Application ID:</label>
+                        <input type="text" id="applicationId">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobileNumber">Mobile Number:</label>
+                        <input type="number" id="mobileNumber">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status">
+                            <option value="">Select Status</option>
+                            <option value="Doc Pending">Doc Pending</option>
+                            <option value="Hot Lead">Hot Lead</option>
+                            <option value="Recheck">Recheck</option>
+                            <option value="Pending">Pending</option>
+                            <option value="AWH">AWH</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subStatus">Sub-Status:</label>
+                        <select id="subStatus">
+                            <option value="">Select Sub-Status</option>
+                            <option value="Mudra">Mudra</option>
+                            <option value="SE">SE</option>
+                            <option value="HIGH ABC">HIGH ABC</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Auto HL">Auto HL</option>
+                            <option value="Force HL">Force HL</option>
+                            <option value="Post HL">Post HL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="remarks">Remarks:</label>
+                        <textarea id="remarks" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon">💾</i> Save
+                        </button>
+                        <button type="button" id="cancelBtn" class="btn btn-secondary">
+                            <i class="icon">❌</i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <span class="close-delete">&times;</span>
+                <h2>Delete Record</h2>
+                <div class="form-group">
+                    <label for="deleteLoanCode">Enter Loan Code to Delete:</label>
+                    <input type="text" id="deleteLoanCode" required>
+                    <button id="fetchDeleteBtn" class="btn btn-info">
+                        <i class="icon">🔍</i> Fetch Record
+                    </button>
+                </div>
+                <div id="deleteRecordDisplay"></div>
+                <div class="form-actions" id="deleteActions" style="display: none;">
+                    <button id="confirmDeleteBtn" class="btn btn-danger">
+                        <i class="icon">🗑️</i> Confirm Delete
+                    </button>
+                    <button id="cancelDeleteBtn" class="btn btn-secondary">
+                        <i class="icon">❌</i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Status Modal -->
+        <div id="updateStatusModal" class="modal">
+            <div class="modal-content">
+                <span class="close-status">&times;</span>
+                <h2>✏️ Update Status</h2>
+                <form id="statusForm">
+                    <div class="form-group">
+                        <label>Loan Code:</label>
+                        <input type="text" id="statusLoanCode" readonly style="background: var(--bg-color);">
+                    </div>
+                    <div class="form-group">
+                        <label for="statusStatus">Status:</label>
+                        <select id="statusStatus" required>
+                            <option value="">Select Status</option>
+                            <option value="Doc Pending">Doc Pending</option>
+                            <option value="Hot Lead">Hot Lead</option>
+                            <option value="Recheck">Recheck</option>
+                            <option value="Pending">Pending</option>
+                            <option value="AWH">AWH</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusSubStatus">Sub-Status:</label>
+                        <select id="statusSubStatus" required>
+                            <option value="">Select Sub-Status</option>
+                            <option value="Mudra">Mudra</option>
+                            <option value="SE">SE</option>
+                            <option value="HIGH ABC">HIGH ABC</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Auto HL">Auto HL</option>
+                            <option value="Force HL">Force HL</option>
+                            <option value="Post HL">Post HL</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon">💾</i> Update
+                        </button>
+                        <button type="button" id="deleteRecordBtn" class="btn btn-danger">
+                            <i class="icon">🗑️</i> Delete
+                        </button>
+                        <button type="button" id="cancelStatusBtn" class="btn btn-secondary">
+                            <i class="icon">❌</i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contest Modal -->
+        <div id="contestModal" class="modal">
+            <div class="modal-content">
+                <span class="close-contest">&times;</span>
+                <h2><i class="icon">🏆</i> Add New Contest</h2>
+                <form id="contestForm">
+                    <div class="form-group">
+                        <label>Contest Name:</label>
+                        <input type="text" id="contestName" required placeholder="e.g., February Hot Lead Challenge">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Date:</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date:</label>
+                            <input type="date" id="endDate" required>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+                        <h3 style="margin: 0;">Slabs</h3>
+                        <button type="button" id="addSlabBtn" class="btn-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white;" title="Add Slab">
+                            ➕
+                        </button>
+                    </div>
+
+                    <div id="slabsContainer"></div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon">💾</i> Save Contest
+                        </button>
+                        <button type="button" id="cancelContestBtn" class="btn btn-secondary">
+                            <i class="icon">❌</i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="message"></div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 | Developed with ❤️ by <a href="https://mainlyvishwajeet.netlify.app" target="_blank" rel="noopener noreferrer">Vishwajeet</a></p>
+        </footer>
+    </div>
+
+    <!-- App Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
